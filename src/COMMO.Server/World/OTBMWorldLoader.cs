@@ -10,7 +10,7 @@ namespace COMMO.Server.World {
 	/// <summary>
 	/// This class contains the methods necessary to load a .otbm file.
 	/// </summary>
-	public static partial class OTBMWorldLoader {
+	public static partial class OTBItemsLoader {
 
 		/// <summary>
 		/// NLog's documentation suggests that we should store a reference to the logger,
@@ -217,17 +217,17 @@ namespace COMMO.Server.World {
 
 
 		private static TileFlags UpdateTileFlags(TileFlags oldFlags, OTBMTileFlags newFlags) {
-			if ((newFlags & OTBMTileFlags.NoLogout) != 0)
-				oldFlags |= TileFlags.NoLogout;
+			//if ((newFlags & OTBMTileFlags.NoLogout) != 0)
+			//	oldFlags |= TileFlags.NoLogout;
 
 			// I think we should throw if a tile contains contradictory flags, instead of just
 			// ignoring them like tfs does...
-			if ((newFlags & OTBMTileFlags.ProtectionZone) != 0)
-				oldFlags |= TileFlags.ProtectionZone;
-			else if ((newFlags & OTBMTileFlags.NoPvpZone) != 0)
-				oldFlags |= TileFlags.NoPvpZone;
-			else if ((newFlags & OTBMTileFlags.PvpZone) != 0)
-				oldFlags |= TileFlags.PvpZone;
+			//if ((newFlags & OTBMTileFlags.ProtectionZone) != 0)
+			//	oldFlags |= TileFlags.ProtectionZone;
+			//else if ((newFlags & OTBMTileFlags.NoPvpZone) != 0)
+			//	oldFlags |= TileFlags.NoPvpZone;
+			//else if ((newFlags & OTBMTileFlags.PvpZone) != 0)
+			//	oldFlags |= TileFlags.PvpZone;
 
 			return oldFlags;
 		}

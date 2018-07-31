@@ -25,7 +25,7 @@ namespace COMMO.Server.World {
 
 		public ITile[,,] Load(int fromSectorX, int toSectorX, int fromSectorY, int toSectorY, byte fromSectorZ, byte toSectorZ) {
 			if (_world == null) {
-				_world = OTBMWorldLoader.LoadWorld(_serializedWorldData);
+				_world = OTBItemsLoader.LoadWorld(_serializedWorldData);
 				_serializedWorldData = null;
 			}
 

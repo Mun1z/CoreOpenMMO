@@ -25,7 +25,7 @@ namespace COMMO.Server.Standalone {
 
 		// private static IOpenTibiaListener managementListener;
 		static void Main() {
-
+			
 			// Loading the logger configuration file
 			var loggerConfigurationPath = Path.Combine("..", "..", "..", "..", "..", "COMMO.Configuration", "LoggerConfiguration.xml");
 			LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(
@@ -44,6 +44,9 @@ namespace COMMO.Server.Standalone {
 			// Initilize client listening pipeline (but reject game connections)
 			_loginListener = new LoginListener(new ManagementHandlerFactory(), 7171);
 			_gameListener = new GameListener(new GameHandlerFactory(), 7172);
+
+			
+
 			// managementListener = new ManagementListener(new ManagementHandlerFactory());
 			var listeningTask = RunAsync(cancellationTokenSource.Token);
 
@@ -58,6 +61,14 @@ namespace COMMO.Server.Standalone {
 			_loginListener.BeginListening();
 			// managementListener.BeginListening();
 			_gameListener.BeginListening();
+
+			//new Thread(() => 
+			//{
+			//	Thread.Sleep(10000);
+			var rawData = File.ReadAllBytes(@"J:\tfs\forgottenserver\data\world\forgotten2.otbm");
+			var relevantData = new Memory<byte>(rawData).Slice(4, rawData.Length - 4);
+			var otbTree = World.OTBItemsLoader.LoadWorld(relevantData);
+			//}).Start();
 
 			while (!cancellationToken.IsCancellationRequested) {
 				await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);

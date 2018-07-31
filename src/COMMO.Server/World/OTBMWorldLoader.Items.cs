@@ -3,7 +3,7 @@ namespace COMMO.Server.World {
 	using COMMO.Server.Items;
 	using System;
 
-	public static partial class OTBMWorldLoader {
+	public static partial class OTBItemsLoader {
 
 		private static Item ParseItemData(OTBParsingStream stream) {
 			var newItemId = GetItemIdAndConvertPvpFieldsToPermanentFields(stream);

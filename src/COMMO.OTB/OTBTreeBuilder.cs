@@ -41,6 +41,10 @@ namespace COMMO.OTB {
 			if (end <= start)
 				throw new InvalidOperationException();
 
+			int a = 0;
+			if(end == 142)
+				 a = 10;
+
 			var nodeData = _serializedTreeData.Slice(
 				start: start,
 				length: end - start);

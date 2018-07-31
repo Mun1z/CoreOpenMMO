@@ -56,6 +56,20 @@ namespace COMMO.Utilities {
 		}
 
 		/// <summary>
+		/// Reads 1 byte from the stream.
+		/// </summary>
+		public bool ReadByte(out byte inc) {
+			inc = 0;
+			if (IsOver)
+				return false;
+
+			var data = _buffer.Span[Position];
+			Position += sizeof(byte);
+			inc = data;
+			return true;
+		}
+
+		/// <summary>
 		/// Reads two bytes from the stream and parses them as a UInt16.
 		/// </summary>
 		public UInt16 ReadUInt16() {

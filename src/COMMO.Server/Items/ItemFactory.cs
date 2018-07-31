@@ -51,7 +51,7 @@ namespace COMMO.Server.Items
                 // throw new ArgumentException("Invalid type.", nameof(typeId));
             }
 
-            if (ItemsCatalog[typeId].Flags.Contains(ItemFlag.Container) || ItemsCatalog[typeId].Flags.Contains(ItemFlag.Chest))
+            if (ItemsCatalog[typeId].IsFluidContainer)
             {
                 return new Container(ItemsCatalog[typeId]);
             }
