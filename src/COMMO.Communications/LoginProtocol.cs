@@ -43,6 +43,11 @@ namespace COMMO.Communications
 
 			//inboundMessage.SkipBytes(4);
 
+			uint recvChecksum = inboundMessage.GetUInt32(); //Adler Checksum
+            uint checksum = Tools.AdlerChecksum(inboundMessage.Buffer, inboundMessage.Position, inboundMessage.Length - 6);
+            if (checksum != recvChecksum)
+                inboundMessage.SkipBytes(-4);
+
             var packetType = (LoginOrManagementIncomingPacketType)inboundMessage.GetByte();
 
             if (packetType != LoginOrManagementIncomingPacketType.LoginServerRequest)
@@ -203,7 +208,7 @@ namespace COMMO.Communications
 
         private void SendCharacterList(Connection connection, string motd, ushort premiumDays, IEnumerable<ICharacterListItem> chars, int version, string sessionKey)
         {
-            var message = new NetworkMessage(4);
+            var message = new NetworkMessage(8);
 
             if (motd != string.Empty)
             {

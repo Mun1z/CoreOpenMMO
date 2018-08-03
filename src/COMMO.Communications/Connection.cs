@@ -163,7 +163,11 @@ namespace COMMO.Communications
         {
             if (useEncryption)
             {
-                message.PrepareToSend(XTeaKey);
+                //message.PrepareToSend(XTeaKey);
+
+				message.InsertPacketLength();
+				Xtea2.EncryptXtea(message, XTeaKey);
+				message.AddCryptoHeader(true);
             }
             else
             {
