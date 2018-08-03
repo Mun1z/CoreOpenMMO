@@ -13,20 +13,39 @@ namespace COMMO.Communications.Packets.Incoming
     {
         public PlayerLoginPacket(NetworkMessage message)
         {
+
+			Os = message.GetUInt16();
+			Version = message.GetUInt16();
+
 			XteaKey = new uint[4];
 			XteaKey[0] = message.GetUInt32();
 			XteaKey[1] = message.GetUInt32();
 			XteaKey[2] = message.GetUInt32();
 			XteaKey[3] = message.GetUInt32();
-
-			Os = message.GetUInt16();
-			Version = message.GetUInt16();
-
+			
 			IsGm = message.GetByte() > 0;
 
-			AccountNumber = message.GetUInt32();
+			SessionKey = message.GetString();
+			
 			CharacterName = message.GetString();
-			Password = message.GetString();
+
+			uint challengeTimestamp = message.GetUInt32();
+            byte challengeRandom = message.GetByte();
+
+			//XteaKey = new uint[4];
+			//XteaKey[0] = message.GetUInt32();
+			//XteaKey[1] = message.GetUInt32();
+			//XteaKey[2] = message.GetUInt32();
+			//XteaKey[3] = message.GetUInt32();
+
+			//Os = message.GetUInt16();
+			//Version = message.GetUInt16();
+
+			//IsGm = message.GetByte() > 0;
+
+			//AccountNumber = message.GetUInt32();
+			//CharacterName = message.GetString();
+			//Password = message.GetString();
         }
 
         public ushort Os { get; set; }
@@ -42,5 +61,7 @@ namespace COMMO.Communications.Packets.Incoming
         public string CharacterName { get; set; }
 
         public string Password { get; set; }
+
+		public string SessionKey { get; }
     }
 }

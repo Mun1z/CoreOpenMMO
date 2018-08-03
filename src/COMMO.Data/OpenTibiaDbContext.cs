@@ -58,6 +58,7 @@ namespace COMMO.Data
             builder.ApplyConfiguration(new RandPlayerConfiguration());
             builder.ApplyConfiguration(new StatConfiguration());
             builder.ApplyConfiguration(new UserConfiguration());
+            builder.ApplyConfiguration(new WorldConfiguration());
 
             base.OnModelCreating(builder);
         }
@@ -91,6 +92,8 @@ namespace COMMO.Data
         public DbSet<Stat> Stats { get; set; }
 
         public DbSet<RandPlayer> RandomPlayers { get; set; }
+
+        public DbSet<World> Worlds { get; set; }
 
     }
 }

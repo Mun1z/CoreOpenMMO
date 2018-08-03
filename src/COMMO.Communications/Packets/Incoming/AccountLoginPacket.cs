@@ -6,6 +6,7 @@
 
 using COMMO.Server.Data;
 using COMMO.Server.Data.Interfaces;
+using System;
 
 namespace COMMO.Communications.Packets.Incoming
 {
@@ -18,7 +19,7 @@ namespace COMMO.Communications.Packets.Incoming
         /// Initializes a new instance of the <see cref="AccountLoginPacket"/> class.
         /// </summary>
         /// <param name="message">The message to parse the packet from.</param>
-        public AccountLoginPacket(NetworkMessage message)
+        public AccountLoginPacket(NetworkMessage message, int version)
         {
 			XteaKey = new uint[]
             {
@@ -28,8 +29,14 @@ namespace COMMO.Communications.Packets.Incoming
                 message.GetUInt32()
             };
 
-			AccountNumber = message.GetUInt32();
+			if(version > 770)
+				AccountNumber = (uint)Int16.Parse(message.GetString());
+			else
+				AccountNumber = message.GetUInt32();
+
 			Password = message.GetString();
+
+			SessionKey = Guid.NewGuid().ToString();
         }
 
         /// <inheritdoc/>
@@ -40,5 +47,8 @@ namespace COMMO.Communications.Packets.Incoming
 
         /// <inheritdoc/>
         public uint[] XteaKey { get; }
+
+		/// <inheritdoc/>
+		public string SessionKey { get; }
     }
 }

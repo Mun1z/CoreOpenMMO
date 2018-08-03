@@ -41,57 +41,61 @@ namespace COMMO.Communications
                 throw new ArgumentNullException(nameof(inboundMessage));
             }
 
+			//inboundMessage.SkipBytes(4);
+
             var packetType = (LoginOrManagementIncomingPacketType)inboundMessage.GetByte();
 
             if (packetType != LoginOrManagementIncomingPacketType.LoginServerRequest)
             {
-                // This packet should NOT have been routed to this protocol.
-                Trace.TraceWarning("Non LoginServerRequest packet routed to LoginProtocol. Packet was ignored.");
-                return;
+				inboundMessage.SkipBytes(3);
+
+				packetType = (LoginOrManagementIncomingPacketType)inboundMessage.GetByte();
+
+				if (packetType != LoginOrManagementIncomingPacketType.LoginServerRequest)
+				{
+					// This packet should NOT have been routed to this protocol.
+					Trace.TraceWarning("Non LoginServerRequest packet routed to LoginProtocol. Packet was ignored.");
+					return;
+				}
             }
 
             var newConnPacket = new NewConnectionPacket(inboundMessage);
             var gameConfig = ServiceConfiguration.GetConfiguration();
 
-            if (newConnPacket.Version != gameConfig.ClientVersionInt)
-            {
-                // TODO: hardcoded messages.
-                SendDisconnect(connection, $"You need client version {gameConfig.ClientVersionString} to connect to this server.");
-                return;
-            }
+            //if (newConnPacket.Version != gameConfig.ClientVersionInt)
+            //{
+            //    // TODO: hardcoded messages.
+            //    SendDisconnect(connection, $"You need client version {gameConfig.ClientVersionString} to connect to this server.");
+            //    return;
+            //}
 
             // Make a copy of the message in case we fail to decrypt using the first set of keys.
             var messageCopy = NetworkMessage.Copy(inboundMessage);
-
-            inboundMessage.RsaDecrypt(useCipKeys: gameConfig.UsingCipsoftRsaKeys);
-
+			
+			inboundMessage.RsaDecrypt(useRsa2: true);
+			
             if (inboundMessage.GetByte() != 0) // means the RSA decrypt was unsuccessful, lets try with the other set of RSA keys...
             {
                 inboundMessage = messageCopy;
 
-                inboundMessage.RsaDecrypt(useCipKeys: !gameConfig.UsingCipsoftRsaKeys);
-
-                if (inboundMessage.GetByte() != 0)
+                inboundMessage.RsaDecrypt(useCipKeys: gameConfig.UsingCipsoftRsaKeys);
+				
+				if (inboundMessage.GetByte() != 0)
                 {
-                    // These RSA keys are also unsuccessful... give up.
-                    // loginPacket = new AccountLoginPacket(inboundMessage);
+						// means the RSA decrypt was unsuccessful, lets try with the other set of RSA keys...
+					inboundMessage = messageCopy;
+					inboundMessage.RsaDecrypt(useCipKeys: !gameConfig.UsingCipsoftRsaKeys);
 
-                    // connection.SetXtea(loginPacket?.XteaKey);
-
-                    //// TODO: hardcoded messages.
-                    // if (gameConfig.UsingCipsoftRSAKeys)
-                    // {
-                    //    SendDisconnect(connection, $"The RSA encryption keys used by your client cannot communicate with this game server.\nPlease use an IP changer that does not replace the RSA Keys.\nWe recommend using Tibia Loader's 7.7 client.\nYou may also download the client from out website.");
-                    // }
-                    // else
-                    // {
-                    //    SendDisconnect(connection, $"The RSA encryption keys used by your client cannot communicate with this game server.\nPlease use an IP changer that replaces the RSA Keys.\nWe recommend using OTLand's IP changer with a virgin 7.7 client.\nYou may also download the client from out website.");
-                    // }
-                    return;
+					if (inboundMessage.GetByte() != 0)
+					{
+						// These RSA keys are also usuccessful... so give up.
+						connection.Close();
+						return;
+					}
                 }
             }
 
-            IAccountLoginInfo loginPacket = new AccountLoginPacket(inboundMessage);
+            IAccountLoginInfo loginPacket = new AccountLoginPacket(inboundMessage, newConnPacket.Version);
 
             connection.SetXtea(loginPacket.XteaKey);
 
@@ -117,7 +121,7 @@ namespace COMMO.Communications
 			            Account_Id = 1,
 			            Player_Id = 1,
 			            Account_Nr = 1,
-			            Charname = "MUNIZ",
+			            Charname = "God",
 						Level = 10,
 						Comment = "Felipe Muniz"
 		            };
@@ -180,7 +184,7 @@ namespace COMMO.Communications
                         }
 
                         // TODO: motd
-                        SendCharacterList(connection, gameConfig.MessageOfTheDay, (ushort)Math.Min(user.Premium_Days + user.Trial_Premium_Days, ushort.MaxValue), charList);
+                        SendCharacterList(connection, gameConfig.MessageOfTheDay, (ushort)Math.Min(user.Premium_Days + user.Trial_Premium_Days, ushort.MaxValue), charList, newConnPacket.Version, loginPacket.SessionKey);
                     }
                 }
             }
@@ -197,7 +201,7 @@ namespace COMMO.Communications
             connection.Send(message);
         }
 
-        private void SendCharacterList(Connection connection, string motd, ushort premiumDays, IEnumerable<ICharacterListItem> chars)
+        private void SendCharacterList(Connection connection, string motd, ushort premiumDays, IEnumerable<ICharacterListItem> chars, int version, string sessionKey)
         {
             var message = new NetworkMessage(4);
 
@@ -205,14 +209,21 @@ namespace COMMO.Communications
             {
                 message.AddPacket(new MessageOfTheDayPacket
                 {
-                    MessageOfTheDay = motd
+                    MessageOfTheDay = "Welcome to The Forgotten Server!"
                 });
             }
+
+			if(version > 770)
+				message.AddPacket(new SessionKeyPacket
+                {
+                    SessionKey = sessionKey
+                });
 
             message.AddPacket(new CharacterListPacket
             {
                 Characters = chars,
-                PremiumDaysLeft = premiumDays
+                PremiumDaysLeft = premiumDays,
+				Version = version
             });
 
             connection.Send(message);

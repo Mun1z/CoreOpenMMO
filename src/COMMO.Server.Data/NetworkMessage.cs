@@ -37,6 +37,12 @@ namespace COMMO.Server.Data
             Reset(startingIndex);
         }
 
+		public NetworkMessage(int startingIndex, int pos)
+        {
+            Reset(startingIndex);
+            position = pos;
+        }
+
         public void Reset(int startingIndex)
         {
             buffer = new byte[bufferSize];
@@ -274,6 +280,11 @@ namespace COMMO.Server.Data
             position = 0;
         }
 
+		public void SetPosition(int pos)
+        {
+            position = pos;
+        }
+		
         public byte[] PeekBytes(int count)
         {
             byte[] t = new byte[count];
@@ -315,9 +326,12 @@ namespace COMMO.Server.Data
             position += count;
         }
 
-        public void RsaDecrypt(bool useCipKeys = true)
+        public void RsaDecrypt(bool useCipKeys = true, bool useRsa2 = false)
         {
-            Rsa.Decrypt(ref buffer, position, length, useCipKeys);
+			if (!useRsa2)
+				Rsa.Decrypt(ref buffer, position, length, useCipKeys);
+			else
+				Rsa2.Decrypt(ref buffer, position, length);
         }
 
         public bool XteaDecrypt(uint[] key)
@@ -363,7 +377,7 @@ namespace COMMO.Server.Data
             }
 
             // Must be after Xtea, because takes the checksum of the encrypted packet
-            // InsertAdler32();
+            InsertAdler32();
             InsertTotalLength();
 
             return true;

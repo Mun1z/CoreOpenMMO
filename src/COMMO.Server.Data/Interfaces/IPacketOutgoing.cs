@@ -1,4 +1,4 @@
-﻿// <copyright file="IPacketOutgoing.cs" company="2Dudes">
+// <copyright file="IPacketOutgoing.cs" company="2Dudes">
 // Copyright (c) 2018 2Dudes. All rights reserved.
 // Licensed under the MIT license.
 // See LICENSE file in the project root for full license information.
@@ -11,6 +11,7 @@ namespace COMMO.Server.Data.Interfaces
         NoType = 0x00,
         Disconnect = 0x0A,
         MessageOfTheDay = 0x14,
+        SessionKey = 0x28,
         CharacterList = 0x64
     }
 

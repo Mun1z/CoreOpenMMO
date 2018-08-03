@@ -16,7 +16,10 @@ namespace COMMO.Communications.Packets.Incoming
 			Os = message.GetUInt16();
 			Version = message.GetUInt16();
 
-            message.SkipBytes(12);
+			if (Version >= 971)
+				message.SkipBytes(17);
+			else
+				message.SkipBytes(12);
         }
 
         public ushort Os { get; set; }
