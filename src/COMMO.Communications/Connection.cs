@@ -116,6 +116,11 @@ namespace COMMO.Communications
                     return false;
                 }
 
+				//var m = InMessage;
+				//var s = Stream;
+				
+				//s.Read(m.Buffer, read, BitConverter.ToUInt16(m.Buffer, 0));
+
                 int size = BitConverter.ToUInt16(InMessage.Buffer, 0) + 2;
 
                 while (read < size)

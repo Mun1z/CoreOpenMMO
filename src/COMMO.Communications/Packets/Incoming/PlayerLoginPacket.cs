@@ -6,6 +6,7 @@
 
 using COMMO.Server.Data;
 using COMMO.Server.Data.Interfaces;
+using System;
 
 namespace COMMO.Communications.Packets.Incoming
 {
@@ -13,10 +14,6 @@ namespace COMMO.Communications.Packets.Incoming
     {
         public PlayerLoginPacket(NetworkMessage message)
         {
-
-			Os = message.GetUInt16();
-			Version = message.GetUInt16();
-
 			XteaKey = new uint[4];
 			XteaKey[0] = message.GetUInt32();
 			XteaKey[1] = message.GetUInt32();
@@ -26,7 +23,13 @@ namespace COMMO.Communications.Packets.Incoming
 			IsGm = message.GetByte() > 0;
 
 			SessionKey = message.GetString();
+
+			var sessionKey = SessionKey.Split('\n');
 			
+			AccountNumber =  (uint)Int16.Parse(sessionKey[0]);
+			Password =  sessionKey[1];
+			var token =  sessionKey[2];
+
 			CharacterName = message.GetString();
 
 			uint challengeTimestamp = message.GetUInt32();

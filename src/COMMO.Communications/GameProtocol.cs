@@ -36,6 +36,11 @@ namespace COMMO.Communications
 
             byte packetType;
 
+			uint recvChecksum = inboundMessage.GetUInt32(); //Adler Checksum
+            uint checksum = Tools.AdlerChecksum(inboundMessage.Buffer, inboundMessage.Position, inboundMessage.Length - 6);
+            if (checksum != recvChecksum)
+                inboundMessage.SkipBytes(-4);
+
             if (!connection.IsAuthenticated || connection.XTeaKey.Sum(b => b) == 0)
             {
                 // this is a new connection...
@@ -50,6 +55,12 @@ namespace COMMO.Communications
 
                 var gameConfig = ServiceConfiguration.GetConfiguration();
 
+				inboundMessage.SetPosition(7);
+				var Os = inboundMessage.GetUInt16();
+				var Version = inboundMessage.GetUInt16();
+
+				inboundMessage.SkipBytes(7); // u32 client version, u8 client type, u16 dat revision
+				
                 // Make a copy of the message in case we fail to decrypt using the first set of keys.
                 var messageCopy = NetworkMessage.Copy(inboundMessage);
 				
@@ -92,7 +103,7 @@ namespace COMMO.Communications
             if (handler?.ResponsePackets != null && handler.ResponsePackets.Any())
             {
                 // Send any responses prepared for 
-                var message = new NetworkMessage(4);
+                var message = new NetworkMessage(8);
 
                 foreach (var outPacket in handler.ResponsePackets)
                 {
