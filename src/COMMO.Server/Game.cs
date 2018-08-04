@@ -28,6 +28,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -155,8 +156,8 @@ namespace COMMO.Server {
 			EventLoader = eventLoader ?? throw new ArgumentNullException(nameof(eventLoader));
 			ItemLoader = itemLoader ?? throw new ArgumentNullException(nameof(itemLoader));
 			MonsterLoader = monsterLoader ?? throw new ArgumentNullException(nameof(monsterLoader));
-			
-			_map = new Map.Map(new WorldLoader(File.ReadAllBytes(@"J:/tfs/mapas/BlankAndDirt.otbm")));
+
+			_map = new Map.Map(new WorldLoader(ServerResourcesManager.GetMap()));
 		}
 
 		/// <summary>
@@ -246,7 +247,7 @@ namespace COMMO.Server {
 			Task.Factory.StartNew(NotificationsProcessor, TaskCreationOptions.LongRunning);
 			//Task.Factory.StartNew(CombatProcessor, TaskCreationOptions.LongRunning);
 
-			EventsCatalog = EventLoader.Load(ServerConfiguration.MoveUseFileName);
+			EventsCatalog = EventLoader.Load("");
 
 			_scheduler.OnEventFired += ProcessFiredEvent;
 
@@ -461,7 +462,7 @@ namespace COMMO.Server {
 		}
 
 		private void PlaceMonsters() {
-			var monsterSpawns = MonsterLoader.LoadSpawns(ServerConfiguration.SpawnsFileName);
+			var monsterSpawns = MonsterLoader.LoadSpawns("");
 			var loadedCount = 0;
 			var spawnsList = monsterSpawns as IList<Spawn> ?? monsterSpawns.ToList();
 			var totalCount = spawnsList.Sum(s => s.Count);

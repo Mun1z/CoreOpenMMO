@@ -40,15 +40,13 @@ namespace COMMO.Server.Items
             }
 
             var itemDictionary = new Dictionary<ushort, ItemType>();
-            var objectsFilePath = "COMMO.Server.Data." + ServerConfiguration.DataFilesDirectory + "." + objectsFileName;
+			
 
-            var assembly = Assembly.GetExecutingAssembly();
-
-            using (var stream = assembly.GetManifestResourceStream(objectsFilePath))
+            using (var stream = ServerResourcesManager.GetItems(objectsFileName))
             {
                 if (stream == null)
                 {
-                    throw new Exception($"Failed to load {objectsFilePath}.");
+                    throw new Exception($"Failed to load {objectsFileName}.");
                 }
 
                 using (var reader = new StreamReader(stream))
@@ -84,7 +82,7 @@ namespace COMMO.Server.Items
 
                         if (data.Length != 2)
                         {
-                            throw new Exception($"Malformed line [{inLine}] in objects file: [{objectsFilePath}]");
+                            throw new Exception($"Malformed line [{inLine}] in objects file: [{objectsFileName}]");
                         }
 
                         var propName = data[0].ToLower().Trim();

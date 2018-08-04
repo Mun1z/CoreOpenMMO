@@ -12,7 +12,7 @@ namespace COMMO.Server
 
         public const string LiveMapDirectory = BaseDirLocalPath + "map";
         public const string OriginalMapDirectory = BaseDirLocalPath + "map";
-
+		
         public const string DataFilesDirectory = "dat";
         public const string MonsterFilesDirectory = "mon";
 

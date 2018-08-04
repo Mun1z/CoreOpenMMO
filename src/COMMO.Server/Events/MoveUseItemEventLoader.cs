@@ -4,20 +4,12 @@
 // See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using COMMO.Data.Contracts;
 using COMMO.Server.Data.Interfaces;
-using COMMO.Server.Items;
-using Sprache;
-using static COMMO.Server.Parsing.Grammar.EventGrammar;
 
-namespace COMMO.Server.Events
-{
-    public class MoveUseItemEventLoader : IItemEventLoader
+namespace COMMO.Server.Events {
+	public class MoveUseItemEventLoader : IItemEventLoader
     {
         /*
             An item definition starts and ends with blank lines.
@@ -34,14 +26,14 @@ namespace COMMO.Server.Events
 
         public IDictionary<ItemEventType, HashSet<IItemEvent>> Load(string moveUseFileName)
         {
-            if (string.IsNullOrWhiteSpace(moveUseFileName))
-            {
-                throw new ArgumentNullException(nameof(moveUseFileName));
-            }
+            //if (string.IsNullOrWhiteSpace(moveUseFileName))
+            //{
+            //    throw new ArgumentNullException(nameof(moveUseFileName));
+            //}
 
-            var moveUseFilePath = "COMMO.Server.Data." + ServerConfiguration.DataFilesDirectory + "." + moveUseFileName;
+            //var moveUseFilePath = "COMMO.Server.Data." + ServerConfiguration.DataFilesDirectory + "." + moveUseFileName;
 
-            var assembly = Assembly.GetExecutingAssembly();
+            //var assembly = Assembly.GetExecutingAssembly();
 
             var eventDictionary = new Dictionary<ItemEventType, HashSet<IItemEvent>>
             {

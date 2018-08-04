@@ -237,65 +237,65 @@ namespace COMMO.Server.Monsters
         /// <returns></returns>
         public IEnumerable<Spawn> LoadSpawns(string spawnsFileName)
         {
-            if (string.IsNullOrWhiteSpace(spawnsFileName))
-            {
-                throw new ArgumentNullException(nameof(spawnsFileName));
-            }
+            //if (string.IsNullOrWhiteSpace(spawnsFileName))
+            //{
+            //    throw new ArgumentNullException(nameof(spawnsFileName));
+            //}
 
             var spawns = new List<Spawn>();
-            var spawnsFilePath = "COMMO.Server.Data." + ServerConfiguration.DataFilesDirectory + "." + spawnsFileName;
+            //var spawnsFilePath = "COMMO.Server.Data." + ServerConfiguration.DataFilesDirectory + "." + spawnsFileName;
 
-            var assembly = Assembly.GetExecutingAssembly();
+            //var assembly = Assembly.GetExecutingAssembly();
 
-            using (var stream = assembly.GetManifestResourceStream(spawnsFilePath))
-            {
-                if (stream == null)
-                {
-                    throw new Exception($"Failed to load {spawnsFilePath}.");
-                }
+            //using (var stream = assembly.GetManifestResourceStream(spawnsFilePath))
+            //{
+            //    if (stream == null)
+            //    {
+            //        throw new Exception($"Failed to load {spawnsFilePath}.");
+            //    }
 
-                using (var reader = new StreamReader(stream))
-                {
-                    foreach (var readLine in reader.ReadToEnd().Split("\r\n".ToCharArray()))
-                    {
-                        var inLine = readLine?.Split(new[] { ObjectsFileItemLoader.CommentSymbol }, 2).FirstOrDefault();
+            //    using (var reader = new StreamReader(stream))
+            //    {
+            //        foreach (var readLine in reader.ReadToEnd().Split("\r\n".ToCharArray()))
+            //        {
+            //            var inLine = readLine?.Split(new[] { ObjectsFileItemLoader.CommentSymbol }, 2).FirstOrDefault();
 
-                        // ignore comments and empty lines.
-                        if (string.IsNullOrWhiteSpace(inLine))
-                        {
-                            continue;
-                        }
+            //            // ignore comments and empty lines.
+            //            if (string.IsNullOrWhiteSpace(inLine))
+            //            {
+            //                continue;
+            //            }
 
-                        var data = inLine.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            //            var data = inLine.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                        if (data.Length != 7)
-                        {
-                            // ignore malformed lines.
-                            continue;
-                        }
+            //            if (data.Length != 7)
+            //            {
+            //                // ignore malformed lines.
+            //                continue;
+            //            }
 
-                        var id = Convert.ToUInt16(data[0]);
-                        var loc = new Location
-                        {
-                            X = Convert.ToInt32(data[1]),
-                            Y = Convert.ToInt32(data[2]),
-                            Z = Convert.ToSByte(data[3])
-                        };
-                        var radius = Convert.ToUInt16(data[4]);
-                        var monCount = Convert.ToByte(data[5]);
-                        var regen = TimeSpan.FromSeconds(Convert.ToUInt32(data[6]));
+            //            var id = Convert.ToUInt16(data[0]);
+            //            var loc = new Location
+            //            {
+            //                X = Convert.ToInt32(data[1]),
+            //                Y = Convert.ToInt32(data[2]),
+            //                Z = Convert.ToSByte(data[3])
+            //            };
+            //            var radius = Convert.ToUInt16(data[4]);
+            //            var monCount = Convert.ToByte(data[5]);
+            //            var regen = TimeSpan.FromSeconds(Convert.ToUInt32(data[6]));
 
-                        spawns.Add(new Spawn
-                        {
-                            Id = id,
-                            Location = loc,
-                            Radius = radius,
-                            Count = monCount,
-                            Regen = regen
-                        });
-                    }
-                }
-            }
+            //            spawns.Add(new Spawn
+            //            {
+            //                Id = id,
+            //                Location = loc,
+            //                Radius = radius,
+            //                Count = monCount,
+            //                Regen = regen
+            //            });
+            //        }
+            //    }
+            //}
 
             return spawns;
         }
