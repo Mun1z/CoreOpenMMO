@@ -4,7 +4,7 @@ using System.Reflection;
 namespace COMMO.Server {
 	public class ServerResourcesManager
     {
-		public const string DataFilesDirectory = "COMMO.Server.Data.dat";
+		public const string ItemsFilesDirectory = "COMMO.Server.Data.items";
 		public const string MapFilesDirectory = "COMMO.Server.Data.map";
         public const string MapName = "COMMO.otbm";
 
@@ -16,8 +16,13 @@ namespace COMMO.Server {
 
 		public static Stream GetItems(string itemsFileName) {
             var assembly = Assembly.GetExecutingAssembly();
-            using (var stream = assembly.GetManifestResourceStream(DataFilesDirectory + "." + itemsFileName))
-				return stream;
+            return assembly.GetManifestResourceStream(ItemsFilesDirectory + "." + itemsFileName);
+		}
+
+		public static byte[] GetItemsBytes(string itemsFileName) {
+            var assembly = Assembly.GetExecutingAssembly();
+            using (var stream = assembly.GetManifestResourceStream(ItemsFilesDirectory + "." + itemsFileName))
+				return ReadFully(stream);
 		}
 
 		private static byte[] ReadFully(Stream input)
