@@ -14,6 +14,7 @@ namespace COMMO.Communications
     public class Connection
     {
         private readonly object _writeLock;
+		private OpenTibiaProtocolType _openTibiaProtocolType;
 
         public delegate void OnConnectionClose(Connection c);
 
@@ -41,8 +42,9 @@ namespace COMMO.Communications
 
         public string SourceIp => Socket?.RemoteEndPoint.ToString();
 
-        public Connection()
+        public Connection(OpenTibiaProtocolType openTibiaProtocolType)
         {
+			_openTibiaProtocolType = openTibiaProtocolType;
             _writeLock = new object();
             Socket = null;
             Stream = null;
@@ -65,6 +67,31 @@ namespace COMMO.Communications
 
             Socket = ((TcpListener)ar.AsyncState).EndAcceptSocket(ar);
             Stream = new NetworkStream(Socket);
+
+			if (Stream.DataAvailable == false && _openTibiaProtocolType == OpenTibiaProtocolType.GameProtocol) //FirstGameConnection
+			{
+				Console.WriteLine("FisrtConnection");
+
+				var message = new NetworkMessage(true);
+				
+				message.AddUInt16(0x0006);
+				message.AddByte(0x1F);
+				
+				//var challengeTimestamp = (uint)(Int64.Parse(DateTime.Now.Ticks.ToString()) / 10000000 - 0x089f7ff5f7b58000); //1533390937
+				var challengeTimestamp = (uint)Environment.TickCount;
+
+				message.AddUInt32(challengeTimestamp); // challengeTimestamp
+
+				var challengeRandom = new Random().Next(0x00, 0xFF);
+
+				message.AddByte((byte)challengeRandom); // challengeRandom
+
+				message.SkipBytes(-12);
+
+				message.AddCheksunInFirstGameConnection();
+
+				Send(message, false);
+			}
 
             if (SimpleDoSDefender.Instance.IsBlockedAddress(SourceIp))
             {
@@ -168,28 +195,42 @@ namespace COMMO.Communications
         {
             if (useEncryption)
             {
-                //message.PrepareToSend(XTeaKey);
-
 				message.InsertPacketLength();
+                //message.PrepareToSend(XTeaKey);
 				Xtea2.EncryptXtea(message, XTeaKey);
 				message.AddCryptoHeader(true);
+
+				try
+				{
+					lock (_writeLock)
+					{
+						Stream.BeginWrite(message.Buffer, 0, message.Length, null, null);
+					}
+				}
+				catch (ObjectDisposedException)
+				{
+					Close();
+				}
             }
             else
             {
-                message.PrepareToSendWithoutEncryption(managementProtocol);
+				message.InsertPacketLength2();
+                //message.PrepareToSendWithoutEncryption(managementProtocol);
+
+				try
+				{
+					lock (_writeLock)
+					{
+						Stream.BeginWrite(message.Buffer, message.HeaderPosition, message.Length, null, null); 
+					}
+				}
+				catch (ObjectDisposedException)
+				{
+					Close();
+				}
             }
 
-            try
-            {
-                lock (_writeLock)
-                {
-                    Stream.BeginWrite(message.Buffer, 0, message.Length, null, null);
-                }
-            }
-            catch (ObjectDisposedException)
-            {
-                Close();
-            }
+            
         }
 
         public void Send(NetworkMessage message)

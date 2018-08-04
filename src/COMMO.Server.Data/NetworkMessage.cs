@@ -39,12 +39,20 @@ namespace COMMO.Server.Data
             Reset(startingIndex);
         }
 
+		public NetworkMessage(bool firstmessage)
+        {
+            _buffer = new byte[_bufferSize];
+            _length = 0;
+            _position = 12;
+			_headerPosition = 8;
+        }
+		
         public void Reset(int startingIndex)
         {
             _buffer = new byte[_bufferSize];
             _length = startingIndex;
             _position = startingIndex;
-			_headerPosition = startingIndex;
+			_headerPosition = 8;
         }
 
         public void Reset()
@@ -156,6 +164,12 @@ namespace COMMO.Server.Data
             }
         }
 
+        public void AddDouble(double value, byte precision = 2)
+        {
+            AddByte(precision);
+            AddUInt32((uint)(value * Math.Pow(10, precision)) + int.MaxValue);
+        }
+
         public void AddString(string value)
         {
             AddUInt16((ushort)value.Length);
@@ -168,6 +182,11 @@ namespace COMMO.Server.Data
         }
 
         public void AddUInt32(uint value)
+        {
+            AddBytes(BitConverter.GetBytes(value));
+        }
+
+        public void AddUInt64(ulong value)
         {
             AddBytes(BitConverter.GetBytes(value));
         }
@@ -351,6 +370,18 @@ namespace COMMO.Server.Data
 			_length += value.Length;
         }
 
+		 public void InsertPacketLength2()
+        {
+			_length = 12;
+			var value = BitConverter.GetBytes((ushort)(_length));
+			_headerPosition -= value.Length; 
+
+            Array.Copy(value, 0, _buffer, _headerPosition, value.Length);
+
+			_length += value.Length;
+        }
+
+
 		public void AddCryptoHeader(bool addChecksum)
         {
             if (addChecksum)
@@ -359,6 +390,11 @@ namespace COMMO.Server.Data
             }
 
             AddHeaderUInt16((ushort)Length);
+        }
+
+		public void AddCheksunInFirstGameConnection()
+        {
+			AddUInt32(Tools.AdlerChecksum(Buffer, 12, Length - 4));
         }
 		
         protected void AddHeaderBytes(byte[] value)

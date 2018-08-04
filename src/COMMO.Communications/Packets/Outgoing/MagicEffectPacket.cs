@@ -23,7 +23,7 @@ namespace COMMO.Communications.Packets.Outgoing
         {
             message.AddByte(PacketType);
             message.AddLocation(Location);
-            message.AddByte((byte)Effect);
+            message.AddByte(11);
         }
 
         public override void CleanUp()

@@ -114,32 +114,32 @@ namespace COMMO.Server.Handlers
                         });
 
                         // Add MapDescription
-                        ResponsePackets.Add(new MapDescriptionPacket
-                        {
-                            Origin = player.Location,
-                            DescriptionBytes = Game.Instance.GetMapDescriptionAt(player, player.Location)
-                        });
+                        //ResponsePackets.Add(new MapDescriptionPacket
+                        //{
+                        //    Origin = player.Location,
+                        //    DescriptionBytes = Game.Instance.GetMapDescriptionAt(player, player.Location)
+                        //});
 
-                        ResponsePackets.Add(new MagicEffectPacket
-                        {
-                            Location = player.Location,
-                            Effect = EffectT.BubbleBlue
-                        });
+                        //ResponsePackets.Add(new MagicEffectPacket
+                        //{
+                        //    Location = player.Location,
+                        //    Effect = EffectT.BubbleBlue
+                        //});
 
-                        ResponsePackets.Add(new PlayerInventoryPacket { Player = player });
-                        ResponsePackets.Add(new PlayerStatusPacket { Player = player });
-                        ResponsePackets.Add(new PlayerSkillsPacket { Player = player });
+                        //ResponsePackets.Add(new PlayerInventoryPacket { Player = player });
+                        //ResponsePackets.Add(new PlayerStatusPacket { Player = player });
+                        //ResponsePackets.Add(new PlayerSkillsPacket { Player = player });
 
-                        ResponsePackets.Add(new WorldLightPacket { Level = Game.Instance.LightLevel, Color = Game.Instance.LightColor });
+                        //ResponsePackets.Add(new WorldLightPacket { Level = Game.Instance.LightLevel, Color = Game.Instance.LightColor });
 
-                        ResponsePackets.Add(new CreatureLightPacket { Creature = player });
+                        //ResponsePackets.Add(new CreatureLightPacket { Creature = player });
 
-                        // Adds a text message
-                        ResponsePackets.Add(new TextMessagePacket
-                        {
-                            Type = MessageType.StatusDefault,
-                            Message = "This is a test message"
-                        });
+                        //// Adds a text message
+                        //ResponsePackets.Add(new TextMessagePacket
+                        //{
+                        //    Type = MessageType.StatusDefault,
+                        //    Message = "This is a test message"
+                        //});
 
                         // std::string tempstring = g_config.getString(ConfigManager::LOGIN_MSG);
                         // if (tempstring.size() > 0)
@@ -183,7 +183,7 @@ namespace COMMO.Server.Handlers
                         // }
 
                         // Send condition icons
-                        ResponsePackets.Add(new PlayerConditionsPacket { Player = player });
+                        //ResponsePackets.Add(new PlayerConditionsPacket { Player = player });
 
                         return;
                     }

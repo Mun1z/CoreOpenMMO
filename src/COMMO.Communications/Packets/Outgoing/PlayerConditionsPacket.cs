@@ -19,7 +19,7 @@ namespace COMMO.Communications.Packets.Outgoing
         {
             message.AddByte(PacketType);
 
-            message.AddByte(0x00);
+            message.AddUInt16(0x00);
         }
 
         public override void CleanUp()
