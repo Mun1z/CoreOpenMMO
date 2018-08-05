@@ -6,6 +6,8 @@
     <Platforms>x64</Platforms>
     <Configurations>Debug;Release</Configurations>
     <RuntimeIdentifiers>win10-x64;ubuntu.16.10-x64</RuntimeIdentifiers>
+    <TieredCompilation>true</TieredCompilation>
+    <TieredCompilation>true</TieredCompilation>
   </PropertyGroup>
 
   <ItemGroup>

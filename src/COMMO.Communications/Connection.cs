@@ -73,7 +73,8 @@ namespace COMMO.Communications
 				Console.WriteLine("FisrtConnection");
 
 				var message = new NetworkMessage(true);
-				
+				message.SkipBytes(sizeof(uint));
+
 				message.AddUInt16(0x0006);
 				message.AddByte(0x1F);
 				
@@ -87,8 +88,9 @@ namespace COMMO.Communications
 				message.AddByte((byte)challengeRandom); // challengeRandom
 
 				message.SkipBytes(-12);
+				message.SetHeaderPosition(12);
 
-				message.AddCheksunInFirstGameConnection();
+				//message.AddCheksunInFirstGameConnection();
 
 				Send(message, false);
 			}
@@ -195,11 +197,11 @@ namespace COMMO.Communications
         {
             if (useEncryption)
             {
+                
 				message.InsertPacketLength();
-                //message.PrepareToSend(XTeaKey);
 				Xtea2.EncryptXtea(message, XTeaKey);
 				message.AddCryptoHeader(true);
-
+				
 				try
 				{
 					lock (_writeLock)
@@ -214,8 +216,7 @@ namespace COMMO.Communications
             }
             else
             {
-				message.InsertPacketLength2();
-                //message.PrepareToSendWithoutEncryption(managementProtocol);
+				message.AddCryptoHeader(true);
 
 				try
 				{

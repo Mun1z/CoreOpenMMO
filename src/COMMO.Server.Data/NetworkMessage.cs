@@ -43,7 +43,7 @@ namespace COMMO.Server.Data
         {
             _buffer = new byte[_bufferSize];
             _length = 0;
-            _position = 12;
+            _position = 8;
 			_headerPosition = 8;
         }
 		
@@ -158,10 +158,13 @@ namespace COMMO.Server.Data
 
             _position += value.Length;
 
-            if (Position > Length)
-            {
-                _length = Position;
-            }
+			if (_position > _length)
+                _length += value.Length;
+
+            //if (Position > Length)
+            //{
+            //    _length = Position;
+            //}
         }
 
         public void AddDouble(double value, byte precision = 2)
@@ -300,6 +303,11 @@ namespace COMMO.Server.Data
         {
             _position = pos;
         }
+
+		public void SetHeaderPosition(int pos)
+        {
+            _headerPosition = pos;
+        }
 		
         public byte[] PeekBytes(int count)
         {
@@ -334,12 +342,10 @@ namespace COMMO.Server.Data
 
         public void SkipBytes(int count)
         {
-            if (Position + count > Length)
-            {
-                throw new IndexOutOfRangeException("NetworkMessage SkipBytes() out of range.");
-            }
-
             _position += count;
+
+            //if (_position > _length)
+            //    _length = _position;
         }
 
         public void RsaDecrypt(bool useCipKeys = true, bool useRsa2 = false)
@@ -369,32 +375,15 @@ namespace COMMO.Server.Data
 
 			_length += value.Length;
         }
-
-		 public void InsertPacketLength2()
-        {
-			_length = 12;
-			var value = BitConverter.GetBytes((ushort)(_length));
-			_headerPosition -= value.Length; 
-
-            Array.Copy(value, 0, _buffer, _headerPosition, value.Length);
-
-			_length += value.Length;
-        }
-
-
+		
 		public void AddCryptoHeader(bool addChecksum)
         {
             if (addChecksum)
             {
-                AddHeaderUInt32(Tools.AdlerChecksum(Buffer, 6, Length));
+                AddHeaderUInt32(Tools.AdlerChecksum(Buffer, _headerPosition, Length));
             }
 
             AddHeaderUInt16((ushort)Length);
-        }
-
-		public void AddCheksunInFirstGameConnection()
-        {
-			AddUInt32(Tools.AdlerChecksum(Buffer, 12, Length - 4));
         }
 		
         protected void AddHeaderBytes(byte[] value)
@@ -427,38 +416,6 @@ namespace COMMO.Server.Data
             }
 
             InsertTotalLength();
-
-            return true;
-        }
-
-        public bool PrepareToSend(uint[] xteaKey)
-        {
-			var a = _buffer;
-
-            // Must be before Xtea, because the packet length is encrypted as well
-            InsertPacketLength();
-
-			a = _buffer;
-
-			//var message = new 
-
-			if (!Xtea2.EncryptXtea(this , xteaKey))
-            {
-                return false;
-            }
-
-            //if (!XteaEncrypt(xteaKey))
-            //{
-            //    return false;
-            //}
-		
-			a = _buffer;
-
-            // Must be after Xtea, because takes the checksum of the encrypted packet
-            //InsertAdler32(Buffer, position, position);
-            InsertTotalLength();
-
-			a = _buffer;
 
             return true;
         }
