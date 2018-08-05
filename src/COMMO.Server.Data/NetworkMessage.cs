@@ -43,8 +43,8 @@ namespace COMMO.Server.Data
         {
             _buffer = new byte[_bufferSize];
             _length = 0;
-            _position = 8;
-			_headerPosition = 8;
+            _position = 6;
+			_headerPosition = 6;
         }
 		
         public void Reset(int startingIndex)

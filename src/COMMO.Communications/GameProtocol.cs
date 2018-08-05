@@ -103,8 +103,7 @@ namespace COMMO.Communications
             if (handler?.ResponsePackets != null && handler.ResponsePackets.Any())
             {
                 // Send any responses prepared for 
-                var message = new NetworkMessage(12);
-				message.SkipBytes(-6);
+                var message = new NetworkMessage(6);
                 message.AddByte(71);
                 message.AddByte(17);
                 message.AddByte(50);

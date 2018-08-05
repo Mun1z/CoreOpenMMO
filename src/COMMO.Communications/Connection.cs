@@ -15,6 +15,7 @@ namespace COMMO.Communications
     {
         private readonly object _writeLock;
 		private OpenTibiaProtocolType _openTibiaProtocolType;
+		private bool _firstConnection = false;
 
         public delegate void OnConnectionClose(Connection c);
 
@@ -68,17 +69,15 @@ namespace COMMO.Communications
             Socket = ((TcpListener)ar.AsyncState).EndAcceptSocket(ar);
             Stream = new NetworkStream(Socket);
 
-			if (Stream.DataAvailable == false && _openTibiaProtocolType == OpenTibiaProtocolType.GameProtocol) //FirstGameConnection
+			if (!_firstConnection && _openTibiaProtocolType == OpenTibiaProtocolType.GameProtocol) //FirstGameConnection
 			{
-				Console.WriteLine("FisrtConnection");
+				_firstConnection = true;
 
 				var message = new NetworkMessage(true);
-				message.SkipBytes(sizeof(uint));
 
 				message.AddUInt16(0x0006);
 				message.AddByte(0x1F);
 				
-				//var challengeTimestamp = (uint)(Int64.Parse(DateTime.Now.Ticks.ToString()) / 10000000 - 0x089f7ff5f7b58000); //1533390937
 				var challengeTimestamp = (uint)Environment.TickCount;
 
 				message.AddUInt32(challengeTimestamp); // challengeTimestamp
@@ -87,11 +86,8 @@ namespace COMMO.Communications
 
 				message.AddByte((byte)challengeRandom); // challengeRandom
 
-				message.SkipBytes(-12);
-				message.SetHeaderPosition(12);
-
-				//message.AddCheksunInFirstGameConnection();
-
+				message.SkipBytes(-6); // go back to header
+				
 				Send(message, false);
 			}
 
@@ -175,85 +171,36 @@ namespace COMMO.Communications
 
             return false;
         }
-
-        // private bool isInTransaction = false;
-        // private NetworkMessage transactionMessage = new NetworkMessage();
-
-        // public void BeginTransaction()
-        // {
-        //    if (!isInTransaction)
-        //    {
-        //        transactionMessage.Reset();
-        //        isInTransaction = true;
-        //    }
-        // }
-
-        // public void CommitTransaction()
-        // {
-        //    SendMessage(transactionMessage, true);
-        //    isInTransaction = false;
-        // }
-        private void SendMessage(NetworkMessage message, bool useEncryption, bool managementProtocol = false)
+		
+        private void Send(NetworkMessage message, bool useEncryption, bool managementProtocol = false)
         {
             if (useEncryption)
             {
-                
 				message.InsertPacketLength();
 				Xtea2.EncryptXtea(message, XTeaKey);
 				message.AddCryptoHeader(true);
-				
-				try
-				{
-					lock (_writeLock)
-					{
-						Stream.BeginWrite(message.Buffer, 0, message.Length, null, null);
-					}
-				}
-				catch (ObjectDisposedException)
-				{
-					Close();
-				}
             }
             else
-            {
 				message.AddCryptoHeader(true);
 
-				try
+			try
+			{
+				lock (_writeLock)
 				{
-					lock (_writeLock)
-					{
-						Stream.BeginWrite(message.Buffer, message.HeaderPosition, message.Length, null, null); 
-					}
+					Stream.BeginWrite(message.Buffer, 0, message.Length, null, null);
 				}
-				catch (ObjectDisposedException)
-				{
-					Close();
-				}
-            }
-
-            
+			}
+			catch (ObjectDisposedException)
+			{
+				Close();
+			}
         }
 
         public void Send(NetworkMessage message)
         {
             Send(message, true);
         }
-
-        public void Send(NetworkMessage message, bool useEncryption, bool managementProtocol = false)
-        {
-            // if (isInTransaction)
-            // {
-            //    if (useEncryption == false)
-            //        throw new Exception("Cannot send a packet without encryption as part of a transaction.");
-
-            // transactionMessage.AddBytes(message.GetPacket());
-            // }
-            // else
-            // {
-            SendMessage(message, useEncryption, managementProtocol);
-            // }
-        }
-
+		
         public void Close()
         {
             Stream.Close();
