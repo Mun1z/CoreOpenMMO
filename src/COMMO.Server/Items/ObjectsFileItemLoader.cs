@@ -175,6 +175,10 @@ namespace COMMO.Server.Items
                         current.SetId(itemStream.ReadUInt16());
                         break;
 
+					case 0x11: // ServerID 0x10 = 16
+                        current.SetClientId(itemStream.ReadUInt16());
+                        break;
+
                     // ClientId 0x11 = 17 -- unused
 
                     /*case 0x12: // Name 0x12 = 18

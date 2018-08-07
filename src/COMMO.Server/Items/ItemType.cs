@@ -26,7 +26,8 @@ namespace COMMO.Server.Items
 
         public bool Locked { get; private set; }
 
-        public ushort ClientId => Flags.Contains(ItemFlag.Disguise) ? Convert.ToUInt16(DefaultAttributes[ItemAttribute.DisguiseTarget]) : TypeId;
+        public ushort ClientId { get; set;}
+        //public ushort ClientId => Flags.Contains(ItemFlag.Disguise) ? Convert.ToUInt16(DefaultAttributes[ItemAttribute.DisguiseTarget]) : TypeId;
 
         public ItemType()
         {
@@ -51,6 +52,11 @@ namespace COMMO.Server.Items
             }
 
             TypeId = typeId;
+        }
+
+		public void SetClientId(ushort clientId)
+        {
+            ClientId = clientId;
         }
 
         public void SetName(string name)
