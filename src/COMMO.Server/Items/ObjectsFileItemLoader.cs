@@ -155,7 +155,9 @@ namespace COMMO.Server.Items
 		var attrsNotSuported = 0;
 		var attrsNotValid = 0;
 
-        var fileTree = OTBDeserializer.DeserializeOTBData(new ReadOnlyMemory<byte>(ServerResourcesManager.GetItemsBytes("items.otb")));
+		var formatIdentifierPrefixLength = 4;
+
+		var fileTree = OTBDeserializer.DeserializeOTBData(new ReadOnlyMemory<byte>(ServerResourcesManager.GetItemsBytes("items.otb")), formatIdentifierPrefixLength);
         foreach (var itemChildren in fileTree.Children)
         {
             var current = new ItemType();
